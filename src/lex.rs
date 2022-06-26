@@ -14,7 +14,7 @@ pub enum TokenKind {
     IntegerLiteral(i32),
 }
 
-const WHITESPACES: [char; 2] = [' ', '\t'];
+const WHITESPACES: [char; 3] = [' ', '\t', '\n'];
 
 lazy_static! {
 
@@ -30,7 +30,8 @@ lazy_static! {
 
     static ref KEYWORD_TOKENS: HashMap<&'static str, TokenKind> = {
         HashMap::from([
-            ("return", TokenKind::ReturnKeyword)
+            ("return", TokenKind::ReturnKeyword),
+            ("int", TokenKind::IntKeyword),
         ])
     };
 
@@ -75,8 +76,12 @@ fn get_next_token(text: &mut String) -> Option<TokenKind> {
     return None;
 }
 
-fn is_whitespace(c: char) -> bool {
+fn is_whitespace(c: &char) -> bool {
     return WHITESPACES.contains(&c);
+}
+
+fn is_basic_char(c: &char) -> bool {
+    return BASIC_TOKENS.contains_key(&c);
 }
 
 fn skip_whitespaces(text: &mut String) {
@@ -87,7 +92,7 @@ fn skip_whitespaces(text: &mut String) {
                 break;
             }
             Some(c) => {
-                if is_whitespace(c) {
+                if is_whitespace(&c) {
                     text.remove(0);
                 }
                 else {
@@ -119,6 +124,16 @@ fn tokenize_basic(text: &String) -> Option<(TokenKind, usize)> {
 }
 
 fn tokenize_keyword(text: &String) -> Option<(TokenKind, usize)> {
+    let possible_token: String = text.chars().into_iter().take_while(|c| {
+        return !is_basic_char(c) && !is_whitespace(c);
+    }).collect();
+
+    for (token_str, token) in KEYWORD_TOKENS.iter() {
+        if possible_token == *token_str {
+            return Some((token.clone(), possible_token.len()));
+        }
+    }
+
     return None
 }
 
