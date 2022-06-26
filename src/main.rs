@@ -1,7 +1,7 @@
-use std::{env, io};
-use std::fs::File;
+use std::{env};
 use std::io::Read;
 use colored::*;
+use crate::lex::tokenize;
 
 mod parse;
 mod lex;
@@ -22,10 +22,12 @@ fn main() {
     };
 
     println!("{}", contents);
+    let tokens = tokenize(contents);
+    println!("{tokens:?}")
 }
 
 fn read_file_contents(filename: &str) -> Result<String, String> {
-    let file = File::open(filename);
+    let file = std::fs::File::open(filename);
 
     let mut file = match file {
         Ok(file) => file,
