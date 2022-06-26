@@ -1,4 +1,7 @@
-#[derive(Debug)]
+use lazy_static::lazy_static;
+use std::collections::HashMap;
+
+#[derive(Debug, Clone)]
 pub enum TokenKind {
     OpenBrace,
     CloseBrace,
@@ -13,6 +16,26 @@ pub enum TokenKind {
 
 const WHITESPACES: [char; 2] = [' ', '\t'];
 
+lazy_static! {
+
+    static ref BASIC_TOKENS: HashMap<char, TokenKind> = {
+        HashMap::from([
+            (';', TokenKind::Semicolon),
+            ('(', TokenKind::OpenParenthesis),
+            (')', TokenKind::CloseParenthesis),
+            ('{', TokenKind::OpenBrace),
+            ('}', TokenKind::CloseBrace),
+        ])
+    };
+
+    static ref KEYWORD_TOKENS: HashMap<&'static str, TokenKind> = {
+        HashMap::from([
+            ("return", TokenKind::ReturnKeyword)
+        ])
+    };
+
+}
+
 pub fn tokenize(text: String) -> Vec<TokenKind> {
     let mut text = text.clone();
     let mut tokens = Vec::new();
@@ -24,7 +47,7 @@ pub fn tokenize(text: String) -> Vec<TokenKind> {
     }
 
     if !text.is_empty() {
-
+        // TODO: Throw exception or something
     }
 
     return tokens
@@ -82,23 +105,16 @@ fn remove_left(text: &mut String, size: usize) {
 fn tokenize_basic(text: &String) -> Option<(TokenKind, usize)> {
     let ch = text.chars().nth(0);
 
-    let token = match ch {
+    return match ch {
         None => None,
         Some(ch) => {
-            match ch {
-                ';' => Some(TokenKind::Semicolon),
-                '(' => Some(TokenKind::OpenParenthesis),
-                ')' => Some(TokenKind::CloseParenthesis),
-                '{' => Some(TokenKind::OpenBrace),
-                '}' => Some(TokenKind::CloseBrace),
-                _ => None
+            for (token_ch, token) in BASIC_TOKENS.iter() {
+                if ch == *token_ch {
+                    return Some((token.clone(), 1));
+                }
             }
+            None
         }
-    };
-
-    return match token {
-        Some(token) => Some((token, 1)),
-        None => None
     };
 }
 
