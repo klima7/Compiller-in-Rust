@@ -1,7 +1,7 @@
 use std::{env};
 use std::io::Read;
 use colored::*;
-use crate::lex::tokenize;
+use crate::lex::lex;
 
 mod parse;
 mod lex;
@@ -22,7 +22,7 @@ fn main() {
     };
 
     println!("{}", contents);
-    let tokens = tokenize(contents);
+    let tokens = lex(contents);
     println!("{tokens:?}")
 }
 
